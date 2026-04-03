@@ -224,16 +224,47 @@ select option{background:var(--surface2)}
 
 /* Mobile nav */
 @media(max-width:768px){
-  .app{grid-template-columns:1fr;grid-template-rows:60px 1fr 64px}
-  .sidebar{display:none}
-  .main{overflow-y:auto;padding-bottom:74px}
+  .app{grid-template-columns:1fr !important;grid-template-rows:56px 1fr 64px}
+  .sidebar{display:none !important}
+  .main{overflow-y:auto;padding-bottom:80px}
   .mobile-nav{display:flex}
-  .g2,.g4{grid-template-columns:1fr 1fr}
-  .g3{grid-template-columns:1fr}
-  .ph{flex-direction:column}
-  .view{padding:16px}
-  .rt{font-size:12px}
-  .rt th,.rt td{padding:8px 6px}
+  .g2,.g3,.g4{grid-template-columns:1fr !important}
+  .ph{flex-direction:column;gap:10px}
+  .view{padding:14px}
+  body{font-size:15px}
+  .pt{font-size:24px}
+  .ps,.cs,.tsm{font-size:13px}
+  .ct{font-size:12px}
+  .cv{font-size:30px}
+  .card{padding:16px}
+  .at{font-size:14px !important}
+  .ad{font-size:13px !important}
+  .btn{font-size:13px;padding:9px 16px}
+  .rt th:nth-child(4),.rt td:nth-child(4),.rt th:nth-child(6),.rt td:nth-child(6){display:none}
+  .rt{font-size:13px}
+  .rt th,.rt td{padding:10px 8px}
+  .mn-item{font-size:10px}
+  .mn-item .mni{font-size:24px}
+  .sst{font-size:15px}
+  .sl{font-size:14px}
+  .sub{font-size:12px}
+  .sr{flex-direction:column;align-items:flex-start;gap:10px}
+  .sr input,.sr select{width:100%}
+  .lti{font-size:14px}
+  .ld{font-size:13px}
+  .pet-card{flex-direction:column}
+  .ht{font-size:13px}
+  .ht th,.ht td{padding:9px 8px}
+  .topnav{padding:0 14px}
+  .logo{font-size:20px}
+  .abadge{display:none}
+  .away-tog{font-size:11px;padding:4px 10px}
+  .gs-banner{flex-direction:column;text-align:center;gap:12px}
+  .fi{flex-wrap:wrap}
+  .litem{flex-wrap:wrap}
+  .lt{min-width:unset;width:100%;text-align:right}
+  .aa{flex-direction:column}
+  .aa .btn{width:100%;text-align:center}
 }
 @media(min-width:769px){.mobile-nav{display:none}}
 .mobile-nav{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(5,1fr);height:64px;z-index:20;padding-bottom:env(safe-area-inset-bottom)}
