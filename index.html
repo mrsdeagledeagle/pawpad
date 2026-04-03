@@ -1096,11 +1096,15 @@ window.addEventListener('DOMContentLoaded',()=>{
 
 // PWA
 if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}
+// Only show install banner on mobile devices, never on desktop
+const isMobile=/iphone|ipad|ipod|android/i.test(navigator.userAgent);
 let deferredPrompt;
-window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;document.getElementById('installBanner').classList.add('show');});
-const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
-const isStandalone=window.navigator.standalone===true;
-if(isIOS&&!isStandalone){setTimeout(()=>document.getElementById('installBanner').classList.add('show'),2500);}
+if(isMobile){
+  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;document.getElementById('installBanner').classList.add('show');});
+  const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isStandalone=window.navigator.standalone===true;
+  if(isIOS&&!isStandalone){setTimeout(()=>document.getElementById('installBanner').classList.add('show'),2500);}
+}
 </script>
 </body>
 </html>
