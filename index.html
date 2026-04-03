@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PawPad — Pet Care Scheduler</title>
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PawPad">
+<meta name="theme-color" content="#E8843A">
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Nunito:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#1A1208;--surface:#241A0E;--surface2:#2F2114;--surface3:#3A2A1A;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#F5EDD8;--text2:#B89E7A;--text3:#7A6848;
+  --orange:#E8843A;--orange-bg:rgba(232,132,58,0.15);--orange-t:#F5B07A;
+  --gold:#C9A84C;--gold-bg:rgba(201,168,76,0.15);--gold-t:#E8C87A;
+  --green:#4A9E6A;--green-bg:rgba(74,158,106,0.15);--green-t:#7AC89A;
+  --red:#C84A4A;--red-bg:rgba(200,74,74,0.15);--red-t:#E87A7A;
+  --blue:#4A7AC8;--blue-bg:rgba(74,122,200,0.15);--blue-t:#7AAAE8;
+  --purple:#8A5AC8;--purple-bg:rgba(138,90,200,0.15);--purple-t:#B87AE8;
+  --r:14px;--rs:8px;
+  --sh:0 2px 12px rgba(0,0,0,0.3);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh}
+h1,h2,h3{font-family:'Playfair Display',serif;font-weight:400}
+
+/* App shell */
+.app{display:grid;grid-template-columns:230px 1fr;grid-template-rows:60px 1fr;min-height:100vh}
+
+/* Top nav */
+.topnav{grid-column:1/-1;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:10}
+.logo{font-family:'Playfair Display',serif;font-size:22px;color:var(--text);display:flex;align-items:center;gap:10px}
+.logo-icon{width:34px;height:34px;background:var(--orange);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.nav-right{display:flex;align-items:center;gap:12px}
+.away-tog{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 14px;cursor:pointer;user-select:none;transition:all .2s}
+.away-tog:hover{border-color:var(--border2)}
+.adot{width:8px;height:8px;border-radius:50%;background:var(--text3);transition:all .3s}
+.adot.on{background:#7B61FF;box-shadow:0 0 0 3px rgba(123,97,255,.25)}
+.abadge{background:var(--orange-bg);color:var(--orange-t);font-size:11px;padding:4px 12px;border-radius:20px;font-weight:600;border:1px solid rgba(232,132,58,.2)}
+.nbell{width:34px;height:34px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;font-size:16px}
+.nc{position:absolute;top:-2px;right:-2px;background:var(--red);color:#fff;font-size:9px;width:15px;height:15px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600}
+
+/* Sidebar */
+.sidebar{background:var(--surface);border-right:1px solid var(--border);padding:20px 0;display:flex;flex-direction:column;overflow-y:auto}
+.ssec{padding:6px 18px 4px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-top:12px}
+.ni{display:flex;align-items:center;gap:10px;padding:9px 18px;cursor:pointer;font-size:13px;color:var(--text2);transition:all .15s;border-left:2px solid transparent;margin:1px 0}
+.ni:hover{background:var(--surface2);color:var(--text)}
+.ni.active{background:var(--orange-bg);color:var(--orange-t);border-left-color:var(--orange);font-weight:600}
+.ni-icon{font-size:16px;width:20px;text-align:center}
+.nbadge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600}
+.nbadge.gold{background:var(--gold)}
+
+/* Main */
+.main{overflow-y:auto;background:var(--bg)}
+.view{display:none;padding:24px}
+.view.active{display:block}
+
+/* Page header */
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px}
+.pt{font-size:28px;color:var(--text);letter-spacing:-.5px}
+.ps{font-size:13px;color:var(--text2);margin-top:3px}
+
+/* Buttons */
+.btn{padding:8px 16px;border-radius:var(--rs);font-size:13px;font-weight:600;cursor:pointer;border:1px solid;transition:all .15s;font-family:'Nunito',sans-serif}
+.bp{background:var(--orange);color:#fff;border-color:var(--orange)}
+.bp:hover{background:#d4722e}
+.bo{background:var(--surface2);color:var(--text);border-color:var(--border2)}
+.bo:hover{background:var(--surface3)}
+.bg{background:transparent;color:var(--text2);border-color:transparent;font-size:12px}
+.bg:hover{color:var(--text)}
+
+/* Alerts */
+.alert{border-radius:var(--r);padding:14px 16px;margin-bottom:10px;border:1px solid;display:flex;gap:12px;align-items:flex-start}
+.alert.gold{background:var(--gold-bg);border-color:rgba(201,168,76,.25)}
+.alert.red{background:var(--red-bg);border-color:rgba(200,74,74,.25)}
+.alert.green{background:var(--green-bg);border-color:rgba(74,158,106,.25)}
+.alert.orange{background:var(--orange-bg);border-color:rgba(232,132,58,.25)}
+.ai{font-size:18px;margin-top:1px;flex-shrink:0}
+.ab2{flex:1}
+.at{font-weight:600;font-size:13px;margin-bottom:3px}
+.alert.gold .at{color:var(--gold-t)}
+.alert.red .at{color:var(--red-t)}
+.alert.green .at{color:var(--green-t)}
+.alert.orange .at{color:var(--orange-t)}
+.ad{font-size:12px;color:var(--text2);line-height:1.5}
+.aa{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+
+/* Stat cards */
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;box-shadow:var(--sh)}
+.ct{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:8px}
+.cv{font-size:26px;font-family:'Playfair Display',serif;color:var(--text)}
+.cs{font-size:12px;color:var(--text2);margin-top:2px}
+
+/* Get started banner */
+.gs-banner{background:linear-gradient(135deg,#7A3A10 0%,#E8843A 100%);border-radius:var(--r);padding:22px 24px;margin-bottom:18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;border:1px solid rgba(232,132,58,.3)}
+
+/* Calendar */
+.cw{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
+.ctb{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border)}
+.cnbtn{background:var(--surface2);border:1px solid var(--border);border-radius:6px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:var(--text2)}
+.ctit{font-size:15px;font-weight:600;color:var(--text)}
+.cvbtn{padding:4px 12px;border-radius:6px;font-size:12px;border:1px solid var(--border);background:transparent;cursor:pointer;color:var(--text2);font-family:'Nunito',sans-serif}
+.cvbtn.active{background:var(--orange);color:#fff;border-color:var(--orange)}
+.cgh{display:grid;grid-template-columns:52px repeat(5,1fr);border-bottom:1px solid var(--border)}
+.dh{padding:10px 4px;text-align:center;font-size:11px;color:var(--text3);font-weight:600;border-left:1px solid var(--border)}
+.dd{display:inline-flex;width:28px;height:28px;align-items:center;justify-content:center;border-radius:50%;font-size:15px;font-weight:600;color:var(--text)}
+.dd.today{background:var(--orange);color:#fff}
+.cgb{display:grid;grid-template-columns:52px repeat(5,1fr);position:relative}
+.ts{height:40px;display:flex;align-items:flex-start;padding-top:2px;justify-content:flex-end;padding-right:8px;font-size:10px;color:var(--text3);border-bottom:1px solid var(--border)}
+.dcb{border-left:1px solid var(--border);position:relative}
+.hl{height:40px;border-bottom:1px solid var(--border)}
+.ev{position:absolute;border-radius:6px;padding:3px 6px;font-size:10px;font-weight:600;line-height:1.3;overflow:hidden;cursor:default;border-left:3px solid}
+.ev.walker{background:var(--green-bg);border-color:var(--green);color:var(--green-t)}
+.ev.sitter{background:var(--purple-bg);border-color:var(--purple);color:var(--purple-t)}
+.ev.vet{background:var(--red-bg);border-color:var(--red);color:var(--red-t)}
+.ev.feeding{background:var(--gold-bg);border-color:var(--gold);color:var(--gold-t)}
+.ev.away{background:var(--blue-bg);border-color:var(--blue);color:var(--blue-t)}
+.ev.gap{background:var(--red-bg);border-color:var(--red);color:var(--red-t)}
+.ev.grooming{background:var(--orange-bg);border-color:var(--orange);color:var(--orange-t)}
+.leg{display:flex;flex-wrap:wrap;gap:12px;padding:10px 18px;border-top:1px solid var(--border)}
+.li{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)}
+.lb{width:12px;height:12px;border-radius:2px}
+
+/* Roster table */
+.rt{width:100%;border-collapse:collapse;font-size:13px}
+.rt th{text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);padding:0 12px 12px}
+.rt td{padding:10px 12px;border-top:1px solid var(--border);vertical-align:middle}
+.rt tr:hover td{background:var(--surface2)}
+.av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0}
+.pc{display:flex;align-items:center;gap:10px}
+.pn{font-weight:600;color:var(--text);font-size:13px}
+.pp{font-size:11px;color:var(--text2)}
+.pill{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.pill.gr{background:var(--green-bg);color:var(--green-t)}
+.pill.go{background:var(--gold-bg);color:var(--gold-t)}
+.pill.rd{background:var(--red-bg);color:var(--red-t)}
+.pill.pu{background:var(--purple-bg);color:var(--purple-t)}
+.pill.or{background:var(--orange-bg);color:var(--orange-t)}
+.pill.bl{background:var(--blue-bg);color:var(--blue-t)}
+.pill.gy{background:var(--surface3);color:var(--text2)}
+
+/* Hours log */
+.ht{width:100%;border-collapse:collapse;font-size:13px}
+.ht th{text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);padding:0 12px 12px}
+.ht td{padding:9px 12px;border-top:1px solid var(--border)}
+.ht .tr td{font-weight:600;background:var(--surface2)}
+
+/* Agent log */
+.alog{display:flex;flex-direction:column;gap:8px}
+.litem{padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);display:flex;gap:12px}
+.lt{font-size:11px;color:var(--text3);white-space:nowrap;margin-top:2px;min-width:62px}
+.lb2{flex:1}
+.lti{font-size:13px;font-weight:600;margin-bottom:2px;color:var(--text)}
+.ld{font-size:12px;color:var(--text2);line-height:1.5}
+.li2{font-size:18px;margin-top:1px;flex-shrink:0}
+.lst{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;margin-top:4px}
+.ls-ok{background:var(--green-bg);color:var(--green-t)}
+.ls-pd{background:var(--gold-bg);color:var(--gold-t)}
+.ls-in{background:var(--blue-bg);color:var(--blue-t)}
+
+/* Lookahead flags */
+.fl2{display:flex;flex-direction:column;gap:8px}
+.fi{display:flex;align-items:flex-start;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);padding:12px 14px}
+.fd{font-size:11px;font-weight:600;min-width:40px;color:var(--text2);text-align:center;line-height:1.3}
+.fdn{font-size:18px;font-family:'Playfair Display',serif;color:var(--text)}
+.fb{flex:1}
+.fti{font-size:13px;font-weight:600;color:var(--text)}
+.fde{font-size:11px;color:var(--text2);margin-top:2px}
+.fdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+
+/* Pets section */
+.pet-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;display:flex;gap:14px;align-items:flex-start}
+.pet-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+.pet-name{font-family:'Playfair Display',serif;font-size:18px;color:var(--text)}
+.pet-sub{font-size:12px;color:var(--text2);margin-top:2px}
+.pet-tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+
+/* Settings */
+.ss{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:16px;overflow:hidden}
+.sst{padding:14px 18px;border-bottom:1px solid var(--border);font-weight:600;font-size:14px;color:var(--text)}
+.sr{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--border)}
+.sr:last-child{border-bottom:none}
+.sl{font-size:13px;color:var(--text)}
+.sub{font-size:11px;color:var(--text2);margin-top:2px}
+.tog{width:38px;height:22px;border-radius:20px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;background:var(--surface3)}
+.tog.on{background:var(--orange)}
+.tog::after{content:'';position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:2px;left:2px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.tog.on::after{transform:translateX(16px)}
+input[type=text],input[type=tel],input[type=time],select,textarea{font-family:'Nunito',sans-serif;font-size:13px;color:var(--text);background:var(--surface2);border:1px solid var(--border2);border-radius:var(--rs);padding:8px 11px;outline:none;transition:border .15s}
+input:focus,select:focus{border-color:var(--orange)}
+select option{background:var(--surface2)}
+
+/* SMS thread */
+.sms{background:var(--surface2);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:8px;max-height:320px;overflow-y:auto}
+.sm{max-width:82%;padding:9px 13px;border-radius:14px;font-size:12px;line-height:1.5}
+.sm.out{background:var(--orange);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.sm.in{background:var(--surface3);color:var(--text);align-self:flex-start;border-bottom-left-radius:4px;border:1px solid var(--border)}
+.stm{font-size:10px;color:var(--text3);text-align:center}
+.slbl{font-size:11px;color:var(--text3);text-align:center;margin:4px 0}
+
+/* Modal */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;align-items:center;justify-content:center;padding:16px}
+.mo.open{display:flex}
+.md{background:var(--surface);border-radius:var(--r);padding:24px;max-width:440px;width:90%;box-shadow:0 8px 40px rgba(0,0,0,.5);border:1px solid var(--border)}
+.md h2{font-size:22px;margin-bottom:4px;color:var(--text)}
+.mds{font-size:13px;color:var(--text2);margin-bottom:18px}
+.fr{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.fl{font-size:12px;font-weight:600;color:var(--text2)}
+.fr input,.fr select{width:100%}
+.ma{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+.div{height:1px;background:var(--border);margin:10px 0}
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sth{font-size:15px;font-weight:600;color:var(--text)}
+.tsm{font-size:12px;color:var(--text2)}
+.row{display:flex;align-items:center;gap:8px}
+
+/* Mobile nav */
+@media(max-width:768px){
+  .app{grid-template-columns:1fr;grid-template-rows:60px 1fr 64px}
+  .sidebar{display:none}
+  .main{overflow-y:auto;padding-bottom:74px}
+  .mobile-nav{display:flex}
+  .g2,.g4{grid-template-columns:1fr 1fr}
+  .g3{grid-template-columns:1fr}
+  .ph{flex-direction:column}
+  .view{padding:16px}
+  .rt{font-size:12px}
+  .rt th,.rt td{padding:8px 6px}
+}
+@media(min-width:769px){.mobile-nav{display:none}}
+.mobile-nav{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(5,1fr);height:64px;z-index:20;padding-bottom:env(safe-area-inset-bottom)}
+.mn-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;font-size:9px;color:var(--text3);padding:6px 4px;border:none;background:none;font-family:'Nunito',sans-serif;font-weight:600;transition:color .15s}
+.mn-item.active{color:var(--orange)}
+.mn-item .mni{font-size:22px;line-height:1}
+
+/* Install banner */
+.install-banner{display:none;position:fixed;bottom:72px;left:12px;right:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;box-shadow:0 4px 20px rgba(0,0,0,.4);z-index:30;flex-direction:row;align-items:center;gap:10px}
+.install-banner.show{display:flex}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- Top nav -->
+<nav class="topnav">
+  <div class="logo">
+    <div class="logo-icon">🐾</div>
+    PawPad
+  </div>
+  <div class="nav-right">
+    <span class="abadge">Agent active</span>
+    <div class="away-tog" id="awayTog" onclick="toggleAway()">
+      <div class="adot on" id="awayDot"></div>
+      <span id="awayLbl">Away mode on</span>
+    </div>
+    <div class="nbell" onclick="showView('agent')">🔔<span class="nc" id="nc">3</span></div>
+  </div>
+</nav>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="ni active" id="nav-dashboard" onclick="showView('dashboard')"><span class="ni-icon">🏠</span> Dashboard</div>
+  <div class="ni" id="nav-calendar" onclick="showView('calendar')"><span class="ni-icon">📅</span> Calendar</div>
+  <div class="ni" id="nav-pets" onclick="showView('pets')"><span class="ni-icon">🐾</span> My pets</div>
+  <div class="ssec">Care Team</div>
+  <div class="ni" id="nav-roster" onclick="showView('roster')"><span class="ni-icon">👥</span> Care roster</div>
+  <div class="ni" id="nav-log" onclick="showView('log')"><span class="ni-icon">📋</span> Visit log & pay</div>
+  <div class="ssec">Agent</div>
+  <div class="ni" id="nav-agent" onclick="showView('agent')"><span class="ni-icon">🤖</span> Agent log <span class="nbadge" id="ab">3</span></div>
+  <div class="ni" id="nav-lookahead" onclick="showView('lookahead')"><span class="ni-icon">🔭</span> Lookahead <span class="nbadge gold">4</span></div>
+  <div class="ssec">Config</div>
+  <div class="ni" id="nav-settings" onclick="showView('settings')"><span class="ni-icon">⚙️</span> Settings</div>
+</aside>
+
+<!-- Main -->
+<main class="main">
+
+<!-- DASHBOARD -->
+<div class="view active" id="view-dashboard">
+  <div class="ph">
+    <div><h1 class="pt">Good morning 🐾</h1><div class="ps">Friday, April 3 · Away mode active · Agent is watching your pets</div></div>
+    <button class="btn bp" onclick="openModal('addVisitM')">+ Schedule visit</button>
+  </div>
+
+  <!-- Get started banner -->
+  <div id="gs-banner" class="gs-banner">
+    <div style="font-size:42px;flex-shrink:0">🐕</div>
+    <div style="flex:1;min-width:180px">
+      <div style="font-family:'Playfair Display',serif;font-size:18px;color:#fff;margin-bottom:4px">Ready to go live?</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.8);line-height:1.5">You're on demo data. Set up your real pets, walkers, sitters, and calendars so PawPad runs on your actual schedule.</div>
+    </div>
+    <button onclick="startSetup()" style="background:#fff;color:#7A3A10;border:none;border-radius:10px;padding:11px 22px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;white-space:nowrap;flex-shrink:0">Get Started →</button>
+    <button onclick="document.getElementById('gs-banner').style.display='none'" style="background:none;border:none;color:rgba(255,255,255,0.6);cursor:pointer;font-size:20px;padding:4px;flex-shrink:0">✕</button>
+  </div>
+
+  <!-- Alerts -->
+  <div id="alerts">
+    <div class="alert gold" id="a1">
+      <div class="ai">⚠️</div>
+      <div class="ab2">
+        <div class="at">Walker unavailable tomorrow · Sat Apr 4, 10 AM walk</div>
+        <div class="ad">Marcus texted that he can't make Saturday morning. Agent contacted backup list overnight — Diego confirmed at $20/walk. Awaiting your approval.</div>
+        <div class="aa">
+          <button class="btn bp" onclick="approveAlert('a1','Approved — Diego confirmed for Saturday 10 AM walk')">Approve plan</button>
+          <button class="btn bo" onclick="showView('roster')">View SMS thread</button>
+          <button class="btn bg" onclick="dismissAlert('a1')">Dismiss</button>
+        </div>
+      </div>
+    </div>
+    <div class="alert red" id="a2">
+      <div class="ai">🏥</div>
+      <div class="ab2">
+        <div class="at">Vet appointment reminder · Mon Apr 6, 2 PM</div>
+        <div class="ad">Biscuit's annual checkup is Monday. No sitter is scheduled for that window — someone needs to take him or arrange drop-off coverage.</div>
+        <div class="aa">
+          <button class="btn bp" onclick="approveAlert('a2','Agent will arrange sitter coverage for vet appointment')">Let agent handle</button>
+          <button class="btn bg" onclick="dismissAlert('a2')">I'll handle it</button>
+        </div>
+      </div>
+    </div>
+    <div class="alert green" id="a3">
+      <div class="ai">✅</div>
+      <div class="ab2">
+        <div class="at">Weekly visit summary ready · Week of Mar 31</div>
+        <div class="ad">Marcus: 5 walks ($90) · Priya: 2 pet-sits ($80) · Total payable: $170. For your reference only.</div>
+        <div class="aa">
+          <button class="btn bo" onclick="showView('log')">View visit log</button>
+          <button class="btn bg" onclick="dismissAlert('a3')">Dismiss</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="g4">
+    <div class="card"><div class="ct">Visits this week</div><div class="cv">7</div><div class="cs">Walks + pet-sits</div></div>
+    <div class="card"><div class="ct">Open gaps</div><div class="cv" style="color:var(--gold)">1</div><div class="cs">Pending approval</div></div>
+    <div class="card"><div class="ct">Upcoming flags</div><div class="cv">4</div><div class="cs">Next 30 days</div></div>
+    <div class="card"><div class="ct">Agent actions</div><div class="cv" style="color:var(--green)">5</div><div class="cs">Handled overnight</div></div>
+  </div>
+
+  <!-- Today -->
+  <div class="sh"><div class="sth">Today's care · Friday Apr 3</div></div>
+  <div class="g2">
+    <div class="card">
+      <div class="ct">Scheduled visits</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px">
+          <div class="av" style="background:var(--green-bg);color:var(--green-t);width:30px;height:30px;font-size:11px">MR</div>
+          <div><b style="font-weight:600">Marcus</b> · Morning walk 8 AM</div>
+          <span class="pill gr" style="margin-left:auto">Done ✓</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px">
+          <div class="av" style="background:var(--gold-bg);color:var(--gold-t);width:30px;height:30px;font-size:11px">PR</div>
+          <div><b style="font-weight:600">Priya</b> · Evening feed 6 PM</div>
+          <span class="pill go" style="margin-left:auto">Upcoming</span>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct">Pets status</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;font-size:13px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:18px">🐕</span>
+          <div style="flex:1"><b style="font-weight:600">Biscuit</b> <span style="color:var(--text2)">— Lab mix</span></div>
+          <span class="pill gr">Fed ✓</span>
+        </div>
+        <div class="div"></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:18px">🐈</span>
+          <div style="flex:1"><b style="font-weight:600">Mochi</b> <span style="color:var(--text2)">— Tabby cat</span></div>
+          <span class="pill go">Feed at 6 PM</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CALENDAR -->
+<div class="view" id="view-calendar">
+  <div class="ph">
+    <div><h1 class="pt">Calendar</h1><div class="ps">Pet care schedule · simulated data</div></div>
+    <div class="row">
+      <button class="cvbtn active" id="cvW" onclick="setCV('week')">Week</button>
+      <button class="cvbtn" id="cvD" onclick="setCV('day')">Day</button>
+    </div>
+  </div>
+  <div class="cw">
+    <div class="ctb">
+      <div class="row" style="gap:8px">
+        <div class="cnbtn" onclick="calNav(-1)">‹</div>
+        <span class="ctit" id="calT">Apr 7–11, 2026</span>
+        <div class="cnbtn" onclick="calNav(1)">›</div>
+      </div>
+      <span class="tsm">Simulated pet care schedules</span>
+    </div>
+    <div class="cgh" id="cHead"></div>
+    <div class="cgb" id="cBody"></div>
+    <div class="leg">
+      <div class="li"><div class="lb" style="background:var(--green-bg);border-left:3px solid var(--green)"></div>Dog walk</div>
+      <div class="li"><div class="lb" style="background:var(--purple-bg);border-left:3px solid var(--purple)"></div>Pet sitter</div>
+      <div class="li"><div class="lb" style="background:var(--gold-bg);border-left:3px solid var(--gold)"></div>Feeding visit</div>
+      <div class="li"><div class="lb" style="background:var(--red-bg);border-left:3px solid var(--red)"></div>Vet appointment</div>
+      <div class="li"><div class="lb" style="background:var(--orange-bg);border-left:3px solid var(--orange)"></div>Grooming</div>
+      <div class="li"><div class="lb" style="background:var(--blue-bg);border-left:3px solid var(--blue)"></div>Owner away</div>
+    </div>
+  </div>
+</div>
+
+<!-- MY PETS -->
+<div class="view" id="view-pets">
+  <div class="ph">
+    <div><h1 class="pt">My pets</h1><div class="ps">Profiles, routines, and care notes</div></div>
+    <button class="btn bp" onclick="openModal('addPetM')">+ Add pet</button>
+  </div>
+  <div class="g2" style="margin-bottom:20px">
+    <div class="pet-card">
+      <div class="pet-icon" style="background:var(--gold-bg)">🐕</div>
+      <div style="flex:1">
+        <div class="pet-name">Biscuit</div>
+        <div class="pet-sub">Labrador mix · 4 years · Male</div>
+        <div class="pet-tags">
+          <span class="pill go">2 walks/day</span>
+          <span class="pill gr">Fed 7am & 6pm</span>
+          <span class="pill gy">No allergies</span>
+        </div>
+        <div style="margin-top:10px;font-size:12px;color:var(--text2);line-height:1.6">
+          <b style="color:var(--text)">Vet:</b> Dr. Chen · (210) 555-0911<br>
+          <b style="color:var(--text)">Meds:</b> Flea/tick monthly<br>
+          <b style="color:var(--text)">Notes:</b> Loves the park, anxious during storms
+        </div>
+      </div>
+    </div>
+    <div class="pet-card">
+      <div class="pet-icon" style="background:var(--purple-bg)">🐈</div>
+      <div style="flex:1">
+        <div class="pet-name">Mochi</div>
+        <div class="pet-sub">Tabby cat · 2 years · Female</div>
+        <div class="pet-tags">
+          <span class="pill pu">Indoor only</span>
+          <span class="pill gr">Fed 7am & 6pm</span>
+          <span class="pill rd">Grain-free diet</span>
+        </div>
+        <div style="margin-top:10px;font-size:12px;color:var(--text2);line-height:1.6">
+          <b style="color:var(--text)">Vet:</b> Dr. Chen · (210) 555-0911<br>
+          <b style="color:var(--text)">Meds:</b> None currently<br>
+          <b style="color:var(--text)">Notes:</b> Shy with strangers, hides at first
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="sh"><div class="sth">Daily routines</div></div>
+  <div class="card">
+    <table class="ht">
+      <thead><tr><th>Time</th><th>Pet</th><th>Task</th><th>Who</th></tr></thead>
+      <tbody>
+        <tr><td>7:00 AM</td><td>🐕 Biscuit</td><td>Morning walk (30 min)</td><td>Walker</td></tr>
+        <tr><td>7:15 AM</td><td>🐕🐈 Both</td><td>Morning feeding</td><td>Walker or owner</td></tr>
+        <tr><td>12:30 PM</td><td>🐕 Biscuit</td><td>Midday walk (if owner away)</td><td>Walker</td></tr>
+        <tr><td>5:30 PM</td><td>🐕 Biscuit</td><td>Evening walk (30 min)</td><td>Walker or owner</td></tr>
+        <tr><td>6:00 PM</td><td>🐕🐈 Both</td><td>Evening feeding</td><td>Walker or owner</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- CARE ROSTER -->
+<div class="view" id="view-roster">
+  <div class="ph">
+    <div><h1 class="pt">Care roster</h1><div class="ps">Walkers, sitters, and pet care team · SMS-based coordination</div></div>
+    <button class="btn bp" onclick="openModal('addCarerM')">+ Add carer</button>
+  </div>
+  <div class="card" style="margin-bottom:18px">
+    <table class="rt">
+      <thead><tr><th>Person</th><th>Role</th><th>Rate</th><th>Contact</th><th>Status</th><th>Visits this week</th><th></th></tr></thead>
+      <tbody>
+        <tr>
+          <td><div class="pc"><div class="av" style="background:var(--green-bg);color:var(--green-t)">MR</div><div><div class="pn">Marcus R.</div><div class="pp">Primary dog walker</div></div></div></td>
+          <td><span class="pill gr">Walker</span></td><td>$18/walk</td>
+          <td><span class="tsm">SMS (210) 555-0101</span></td>
+          <td><span class="pill gr">Active</span></td><td>5 visits</td>
+          <td><button class="btn bg">Edit</button></td>
+        </tr>
+        <tr>
+          <td><div class="pc"><div class="av" style="background:var(--gold-bg);color:var(--gold-t)">PR</div><div><div class="pn">Priya S.</div><div class="pp">Pet sitter / feeder</div></div></div></td>
+          <td><span class="pill go">Sitter</span></td><td>$40/night</td>
+          <td><span class="tsm">SMS (210) 555-0202</span></td>
+          <td><span class="pill go">2 visits</span></td><td>2 visits</td>
+          <td><button class="btn bg">Edit</button></td>
+        </tr>
+        <tr>
+          <td><div class="pc"><div class="av" style="background:var(--blue-bg);color:var(--blue-t)">DG</div><div><div class="pn">Diego G.</div><div class="pp">Backup walker</div></div></div></td>
+          <td><span class="pill bl">Backup</span></td><td>$20/walk</td>
+          <td><span class="tsm">SMS (210) 555-0303</span></td>
+          <td><span class="pill go">Sat confirmed</span></td><td>0 visits</td>
+          <td><button class="btn bg">Edit</button></td>
+        </tr>
+        <tr>
+          <td><div class="pc"><div class="av" style="background:var(--purple-bg);color:var(--purple-t)">TC</div><div><div class="pn">Taylor C.</div><div class="pp">Backup sitter</div></div></div></td>
+          <td><span class="pill pu">Backup</span></td><td>$35/night</td>
+          <td><span class="tsm">SMS (210) 555-0404</span></td>
+          <td><span class="pill gy">Available</span></td><td>0 visits</td>
+          <td><button class="btn bg">Edit</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sh" style="margin-top:20px"><div class="sth">SMS thread — Saturday walk gap</div><span class="tsm">Agent handled overnight · you slept</span></div>
+  <div class="card">
+    <div class="sms">
+      <div class="stm">Thu Apr 2 · 10:58 PM</div>
+      <div class="slbl">Marcus → Agent</div>
+      <div class="sm in">Hey sorry, something came up Saturday morning — I can't do the 10am walk. Really sorry for short notice!</div>
+      <div class="slbl">Agent → Diego (backup #1)</div>
+      <div class="sm out">Hi Diego, this is the PawPad scheduler. Are you available Sat Apr 4 at 10 AM for a dog walk at $20? Reply YES or NO.</div>
+      <div class="stm">10:59 PM</div>
+      <div class="sm in">YES, no problem! 🐕</div>
+      <div class="slbl">Agent → Marcus</div>
+      <div class="sm out">Hi Marcus — no worries! Diego will cover Saturday 10 AM. You're still on for your regular schedule next week.</div>
+      <div class="slbl">Agent → You (7 AM summary)</div>
+      <div class="sm out">🐾 PawPad: Saturday gap filled while you slept. Diego confirmed for Sat 10 AM walk ($20). No action needed — Biscuit is covered!</div>
+    </div>
+  </div>
+</div>
+
+<!-- VISIT LOG -->
+<div class="view" id="view-log">
+  <div class="ph">
+    <div><h1 class="pt">Visit log & pay</h1><div class="ps">Weekly care summary — for your reference only, no payments made here</div></div>
+    <select style="background:var(--surface2)"><option>Week of Mar 31, 2026</option><option>Week of Mar 24, 2026</option><option>Week of Mar 17, 2026</option></select>
+  </div>
+  <div class="card" style="margin-bottom:16px">
+    <div class="sh"><div class="sth">Marcus R. — Dog walker</div><span class="pill gr">$18/walk</span></div>
+    <table class="ht">
+      <thead><tr><th>Day</th><th>Visit</th><th>Pet</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Mon Mar 31</td><td>8 AM walk · 30 min</td><td>🐕 Biscuit</td><td style="color:var(--text2)">Regular</td></tr>
+        <tr><td>Tue Apr 1</td><td>8 AM + 5:30 PM</td><td>🐕 Biscuit</td><td style="color:var(--text2)">Regular</td></tr>
+        <tr><td>Wed Apr 2</td><td>8 AM walk · 30 min</td><td>🐕 Biscuit</td><td style="color:var(--text2)">Regular</td></tr>
+        <tr><td>Thu Apr 3</td><td>8 AM walk · 30 min</td><td>🐕 Biscuit</td><td style="color:var(--text2)">Regular</td></tr>
+        <tr class="tr"><td colspan="2">Total — 5 walks</td><td></td><td style="color:var(--green-t)">≈ $90</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="card" style="margin-bottom:16px">
+    <div class="sh"><div class="sth">Priya S. — Pet sitter</div><span class="pill go">$40/night</span></div>
+    <table class="ht">
+      <thead><tr><th>Day</th><th>Visit</th><th>Pets</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Fri Apr 3</td><td>Evening feed 6 PM</td><td>🐕🐈 Both</td><td style="color:var(--text2)">Owner away</td></tr>
+        <tr><td>Sat Apr 4</td><td>Full day sit</td><td>🐕🐈 Both</td><td style="color:var(--text2)">Owner away</td></tr>
+        <tr class="tr"><td colspan="2">Total — 2 visits</td><td></td><td style="color:var(--gold-t)">≈ $80</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:15px;font-weight:600;color:var(--text)">Week total</span>
+      <span style="font-size:24px;font-family:'Playfair Display',serif;color:var(--orange)">$170</span>
+    </div>
+    <div class="tsm" style="margin-top:6px">2 carers · 7 visits total · Pay your carers directly — this is a reference only</div>
+  </div>
+</div>
+
+<!-- AGENT LOG -->
+<div class="view" id="view-agent">
+  <div class="ph"><div><h1 class="pt">Agent log</h1><div class="ps">Everything the agent did while you were away or asleep</div></div></div>
+  <div class="alog">
+    <div class="litem"><div class="li2">✈️</div><div class="lb2"><div class="lti">Away mode activated</div><div class="ld">You set away mode. Agent took full autonomous scheduling authority for pet care coverage.</div><span class="lst ls-in">System</span></div><div class="lt">9:30 PM<br>Apr 2</div></div>
+    <div class="litem"><div class="li2">📱</div><div class="lb2"><div class="lti">Marcus reported unavailable Saturday 10 AM</div><div class="ld">Inbound SMS from Marcus. Agent acknowledged and started gap-fill protocol without waking you.</div><span class="lst ls-in">Received</span></div><div class="lt">10:58 PM<br>Apr 2</div></div>
+    <div class="litem"><div class="li2">🤖</div><div class="lb2"><div class="lti">Contacted Diego — backup walker #1</div><div class="ld">SMS: "Hi Diego, this is PawPad. Available Sat Apr 4 at 10 AM for a dog walk at $20? Reply YES or NO."</div><span class="lst ls-pd">Awaiting</span></div><div class="lt">10:59 PM<br>Apr 2</div></div>
+    <div class="litem"><div class="li2">✅</div><div class="lb2"><div class="lti">Diego confirmed — Biscuit is covered</div><div class="ld">Diego replied YES. Marcus notified. Schedule updated. You were not woken up.</div><span class="lst ls-ok">Resolved</span></div><div class="lt">11:00 PM<br>Apr 2</div></div>
+    <div class="litem"><div class="li2">🔭</div><div class="lb2"><div class="lti">30-day lookahead scan completed</div><div class="ld">4 flags found: vet appointment Apr 6, grooming due Apr 15, long weekend May 1–3 (full coverage needed), flea treatment due Apr 20.</div><span class="lst ls-in">Flagged</span></div><div class="lt">12:00 AM<br>Apr 3</div></div>
+    <div class="litem"><div class="li2">📊</div><div class="lb2"><div class="lti">Weekly visit summary compiled</div><div class="ld">Marcus: 5 walks ($90) · Priya: 2 visits ($80) · Total: $170. Ready on Visit log tab.</div><span class="lst ls-ok">Done</span></div><div class="lt">7:00 AM<br>Apr 3</div></div>
+    <div class="litem"><div class="li2">🌅</div><div class="lb2"><div class="lti">Morning summary delivered</div><div class="ld">All overnight changes summarized. Your pets are covered — you wake up stress-free.</div><span class="lst ls-ok">Delivered</span></div><div class="lt">7:01 AM<br>Apr 3</div></div>
+  </div>
+</div>
+
+<!-- LOOKAHEAD -->
+<div class="view" id="view-lookahead">
+  <div class="ph"><div><h1 class="pt">30-day lookahead</h1><div class="ps">Upcoming care gaps and pet schedule flags</div></div></div>
+  <div class="fl2">
+    <div class="fi">
+      <div class="fd"><div class="fdn">6</div>Apr</div>
+      <div style="width:1px;background:var(--border);margin:2px 0;flex-shrink:0"></div>
+      <div class="fb"><div class="fti">Biscuit vet appointment — 2 PM</div><div class="fde">Annual checkup. No coverage scheduled for drop-off and pick-up window.</div></div>
+      <div class="fdot" style="background:var(--red)"></div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <button class="btn bp" style="font-size:11px;padding:5px 10px" onclick="flagHandle(this)">Agent handle</button>
+        <button class="btn bo" style="font-size:11px;padding:5px 10px">Manual</button>
+      </div>
+    </div>
+    <div class="fi">
+      <div class="fd"><div class="fdn">15</div>Apr</div>
+      <div style="width:1px;background:var(--border);margin:2px 0;flex-shrink:0"></div>
+      <div class="fb"><div class="fti">Biscuit grooming due</div><div class="fde">Last grooming was Mar 15 — 30-day cycle. Agent can book appointment and arrange transport.</div></div>
+      <div class="fdot" style="background:var(--gold)"></div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <button class="btn bp" style="font-size:11px;padding:5px 10px" onclick="flagHandle(this)">Agent book</button>
+        <button class="btn bo" style="font-size:11px;padding:5px 10px">Manual</button>
+      </div>
+    </div>
+    <div class="fi">
+      <div class="fd"><div class="fdn">20</div>Apr</div>
+      <div style="width:1px;background:var(--border);margin:2px 0;flex-shrink:0"></div>
+      <div class="fb"><div class="fti">Flea & tick treatment due — both pets</div><div class="fde">Monthly treatment for Biscuit and Mochi. Agent can remind you or add to vet visit.</div></div>
+      <div class="fdot" style="background:var(--gold)"></div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <button class="btn bp" style="font-size:11px;padding:5px 10px" onclick="flagHandle(this)">Agent remind</button>
+        <button class="btn bo" style="font-size:11px;padding:5px 10px">Manual</button>
+      </div>
+    </div>
+    <div class="fi">
+      <div class="fd"><div class="fdn">1–3</div>May</div>
+      <div style="width:1px;background:var(--border);margin:2px 0;flex-shrink:0"></div>
+      <div class="fb"><div class="fti">Long weekend — full coverage needed</div><div class="fde">3 days away detected from calendar. Need walker + sitter coverage for all 3 days for both pets.</div></div>
+      <div class="fdot" style="background:var(--red)"></div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <button class="btn bp" style="font-size:11px;padding:5px 10px" onclick="flagHandle(this)">Agent handle</button>
+        <button class="btn bo" style="font-size:11px;padding:5px 10px">Manual</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div class="view" id="view-settings">
+  <div class="ph"><div><h1 class="pt">Settings</h1><div class="ps">Agent behavior, calendars, and contacts</div></div></div>
+
+  <div class="ss">
+    <div class="sst">Agent behavior</div>
+    <div class="sr"><div><div class="sl">Away mode</div><div class="sub">Agent acts fully autonomously when you're away — no approval needed for care gaps</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+    <div class="sr"><div><div class="sl">Auto-fill walk/sit gaps</div><div class="sub">Contact pre-approved backups automatically when primary carer cancels</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+    <div class="sr"><div><div class="sl">Require approval when home</div><div class="sub">Present plan for approval before contacting carers while you're home</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+    <div class="sr"><div><div class="sl">30-day lookahead scans</div><div class="sub">Scan for care gaps and flag vet/grooming schedules nightly</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+    <div class="sr"><div><div class="sl">Weekly visit summary</div><div class="sub">Send pay log every Sunday morning</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+    <div class="sr"><div><div class="sl">Vet & grooming reminders</div><div class="sub">Agent tracks recurring pet health tasks and flags them ahead of time</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+    <div class="sr"><div><div class="sl">Setup wizard</div><div class="sub">Re-run the getting started wizard to update pets, carers, or calendars</div></div><button class="btn bp" style="font-size:12px" onclick="startSetup()">Open setup →</button></div>
+    <div class="sr"><div><div class="sl">Replay onboarding tour</div><div class="sub">Walk through the app introduction again</div></div><button class="btn bo" style="font-size:12px" onclick="startOnboarding()">Replay tour</button></div>
+  </div>
+
+  <div class="ss">
+    <div class="sst">Calendars to watch <span style="font-size:12px;font-weight:400;color:var(--text3);margin-left:8px">— connect when ready to go live</span></div>
+    <div class="sr"><div><div class="sl">Your personal calendar</div><div class="sub">Not connected — detects when you're away or travelling</div></div><button class="btn bo" style="font-size:12px">Connect Google Cal</button></div>
+    <div class="sr"><div><div class="sl">Partner's calendar</div><div class="sub">Not connected — demo mode</div></div><button class="btn bo" style="font-size:12px">Connect Google Cal</button></div>
+    <div class="sr"><div><div class="sl">Vet calendar</div><div class="sub">Not connected — import vet appointment reminders</div></div><button class="btn bo" style="font-size:12px">Connect Google Cal</button></div>
+  </div>
+
+  <div class="ss">
+    <div class="sst">Away hours & contacts</div>
+    <div class="sr"><div class="sl">Your phone (SMS + notifications)</div><input type="tel" value="(210) 555-0001" style="width:180px"></div>
+    <div class="sr"><div class="sl">Partner's phone</div><input type="tel" value="(210) 555-0002" style="width:180px"></div>
+    <div class="sr"><div><div class="sl">Max rate for auto-approval</div><div class="sub">Agent won't book above this without asking you first</div></div><select style="width:130px"><option>$20/walk</option><option selected>$25/walk</option><option>$30/walk</option><option>No limit</option></select></div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<!-- Mobile nav -->
+<div class="mobile-nav">
+  <button class="mn-item active" id="mn-dashboard" onclick="showView('dashboard');setMN('dashboard')"><span class="mni">🏠</span>Home</button>
+  <button class="mn-item" id="mn-calendar" onclick="showView('calendar');setMN('calendar')"><span class="mni">📅</span>Calendar</button>
+  <button class="mn-item" id="mn-pets" onclick="showView('pets');setMN('pets')"><span class="mni">🐾</span>Pets</button>
+  <button class="mn-item" id="mn-roster" onclick="showView('roster');setMN('roster')"><span class="mni">👥</span>Roster</button>
+  <button class="mn-item" id="mn-settings" onclick="showView('settings');setMN('settings')"><span class="mni">⚙️</span>More</button>
+</div>
+
+<!-- Install banner -->
+<div class="install-banner" id="installBanner">
+  <div style="width:36px;height:36px;background:var(--orange);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🐾</div>
+  <div style="flex:1;font-size:12px;color:var(--text2);line-height:1.4"><strong style="display:block;font-size:13px;color:var(--text);margin-bottom:2px">Add PawPad to your home screen</strong>Tap Share → "Add to Home Screen" for the full app experience</div>
+  <button onclick="document.getElementById('installBanner').classList.remove('show')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;padding:4px;flex-shrink:0">✕</button>
+</div>
+
+<!-- Modals -->
+<div class="mo" id="addVisitM">
+  <div class="md">
+    <h2>Schedule a visit</h2><div class="mds">Manually book a walk, sit, or feeding</div>
+    <div class="fr"><label class="fl">Date</label><input type="text" placeholder="Apr 5, 2026"></div>
+    <div class="fr"><label class="fl">Time</label><input type="time" value="08:00"></div>
+    <div class="fr"><label class="fl">Visit type</label><select><option>Dog walk (30 min)</option><option>Dog walk (60 min)</option><option>Pet sit — half day</option><option>Pet sit — full day</option><option>Feeding visit</option><option>Overnight stay</option></select></div>
+    <div class="fr"><label class="fl">Assign to</label><select><option>Marcus R. ($18/walk)</option><option>Priya S. ($40/night)</option><option>Diego G. ($20/walk)</option><option>Taylor C. ($35/night)</option></select></div>
+    <div class="fr"><label class="fl">Pets</label><select><option>Biscuit only</option><option>Mochi only</option><option>Both pets</option></select></div>
+    <div class="ma"><button class="btn bo" onclick="closeModal('addVisitM')">Cancel</button><button class="btn bp" onclick="closeModal('addVisitM')">Save visit</button></div>
+  </div>
+</div>
+
+<div class="mo" id="addCarerM">
+  <div class="md">
+    <h2>Add carer</h2><div class="mds">They receive SMS only — no app download needed</div>
+    <div class="fr"><label class="fl">Full name</label><input type="text" placeholder="Full name"></div>
+    <div class="fr"><label class="fl">Mobile (for SMS)</label><input type="tel" placeholder="(210) 555-0000"></div>
+    <div class="fr"><label class="fl">Role</label><select><option>Primary dog walker</option><option>Primary pet sitter</option><option>Backup walker</option><option>Backup sitter</option><option>Vet / groomer</option></select></div>
+    <div class="fr"><label class="fl">Rate</label><input type="text" placeholder="$18/walk or $40/night"></div>
+    <div class="fr"><label class="fl">Priority in backup list</label><select><option>1st contact</option><option>2nd contact</option><option>3rd contact</option></select></div>
+    <div class="ma"><button class="btn bo" onclick="closeModal('addCarerM')">Cancel</button><button class="btn bp" onclick="closeModal('addCarerM')">Add to roster</button></div>
+  </div>
+</div>
+
+<div class="mo" id="addPetM">
+  <div class="md">
+    <h2>Add pet</h2><div class="mds">Tell PawPad about your dog or cat</div>
+    <div class="fr"><label class="fl">Pet name</label><input type="text" placeholder="e.g. Biscuit"></div>
+    <div class="fr"><label class="fl">Type</label><select><option>🐕 Dog</option><option>🐈 Cat</option></select></div>
+    <div class="fr"><label class="fl">Breed</label><input type="text" placeholder="e.g. Labrador mix"></div>
+    <div class="fr"><label class="fl">Age</label><input type="text" placeholder="e.g. 4 years"></div>
+    <div class="fr"><label class="fl">Feeding schedule</label><select><option>Twice daily (7am & 6pm)</option><option>Three times daily</option><option>Once daily</option><option>Free feeding</option></select></div>
+    <div class="fr"><label class="fl">Special notes / dietary needs</label><textarea placeholder="Allergies, medications, quirks..." style="width:100%;height:72px;resize:none"></textarea></div>
+    <div class="ma"><button class="btn bo" onclick="closeModal('addPetM')">Cancel</button><button class="btn bp" onclick="closeModal('addPetM')">Add pet</button></div>
+  </div>
+</div>
+
+<!-- ══════════════════ ONBOARDING TOUR ══════════════════ -->
+<div id="onboarding" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.8);align-items:center;justify-content:center;padding:16px;font-family:'Nunito',sans-serif;">
+  <div style="background:var(--surface);border-radius:20px;width:100%;max-width:420px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.5);border:1px solid var(--border);">
+    <div style="height:4px;background:var(--surface3)"><div id="ob-progress" style="height:4px;background:var(--orange);transition:width .35s ease;width:12.5%"></div></div>
+    <div id="ob-slides" style="overflow:hidden">
+      <div id="ob-track" style="display:flex;transition:transform .35s cubic-bezier(.4,0,.2,1)">
+
+        <div class="ob-slide" style="min-width:100%;padding:28px 26px 20px">
+          <div style="width:52px;height:52px;background:var(--orange-bg);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:16px">🐾</div>
+          <h2 style="font-size:24px;color:var(--text);margin-bottom:10px">Welcome to PawPad</h2>
+          <p style="font-size:14px;color:var(--text2);line-height:1.65">PawPad is your pet care command center. It keeps your dogs and cats looked after — coordinating walkers, sitters, vet visits, and feeding schedules, even when you're away or asleep.</p>
+          <p style="font-size:13px;color:var(--text3);margin-top:14px">Quick tour — about 60 seconds. Swipe or tap Next.</p>
+        </div>
+
+        <div class="ob-slide" style="min-width:100%;padding:28px 26px 20px">
+          <div style="width:52px;height:52px;background:var(--red-bg);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:16px">😩</div>
+          <h2 style="font-size:24px;color:var(--text);margin-bottom:10px">The problem it solves</h2>
+          <p style="font-size:14px;color:var(--text2);line-height:1.65">Your dog walker cancels at 11 PM. You're travelling and get the text at midnight. Who covers? Who do you call? PawPad handles it automatically — your pets are covered before you even wake up.</p>
+        </div>
+
+        <div class="ob-slide" style="min-width:100%;padding:28px 26px 20px">
+          <div style="width:52px;height:52px;background:var(--blue-bg);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:16px">✈️</div>
+          <h2 style="font-size:24px;color:var(--text);margin-bottom:10px">Away mode</h2>
+          <p style="font-size:14px;color:var(--text2);line-height:1.65">Turn on <strong style="color:var(--text)">Away mode</strong> when you leave. The agent watches your pet care schedule and acts autonomously — no waking you up at midnight for a problem it can solve itself.</p>
+          <div style="background:var(--surface2);border-radius:10px;padding:12px 14px;margin-top:14px;font-size:13px;color:var(--text2);line-height:1.6;border:1px solid var(--border)"><strong style="color:var(--text);display:block;margin-bottom:4px">Example:</strong>Walker cancels at 11 PM. Agent texts your backup list. First YES gets the walk. You get a summary at 7 AM. Biscuit's morning walk never missed.</div>
+        </div>
+
+        <div class="ob-slide" style="min-width:100%;padding:28px 26px 20px">
+          <div style="width:52px;height:52px;background:var(--orange-bg);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:16px">🏠</div>
+          <h2 style="font-size:24px;color:var(--text);margin-bottom:10px">Dashboard</h2>
+          <p style="font-size:14px;color:var(--text2);line-height:1.65">Your morning view. See what's happening today for each pet, any alerts the agent resolved overnight, and your pets' current status — fed, walked, covered.</p>
+        </div>
+
+        <div class="ob-slide" style="min-width:100%;padding:28px 26px 20px">
+          <div style="width:52px;height:52px;background:var(--green-bg);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:16px">📅</div>
+          <h2 style="font-size:24px;color:var(--text);margin-bottom:10px">Calendar</h2>
+          <p style="font-size:14px;color:var(--text2);line-height:1.65">Color-coded schedule of every visit, walk, sit, vet trip, and grooming appointment across all your pets.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
+            <div style="background:var(--green-bg);border-left:3px solid var(--green);border-radius:6px;padding:7px 10px;font-size:12px;color:var(--green-t);font-weight:600">🟢 Dog walk</div>
+            <div style="background:var(--purple-bg);border-left:3px solid var(--purple);border-radius:6px;padding:7px 10px;font-size:12px;color:var(--purple-t);font-weight:600">🟣 Pet sitter</div>
+            <div style="background:var(--gold-bg);border-left:3px solid var(--gold);border-radius:6px;padding:7px 10px;font-size:12px;color:var(--gold-t);font-weight:600">🟡 Feeding visit</div>
+            <div style="background:var(--red-bg);border-left:3px solid var(--red);border-radius:6px;padding:7px 10px;font-size:12px;color:var(--red-t);font-weight:600">🔴 Vet appointment</div>
+          </div>
+        </div>
+
+        <div class="ob-slide" style="min-width:100%;padding:28px 26px 20px">
+          <div style="width:52px;height:52px;background:var(--green-bg);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:16px">👥</div>
+          <h2 style="font-size:24px;color:var(--text);margin-bottom:10px">Care roster</h2>
+          <p style="font-size:14px;color:var(--text2);line-height:1.65">Add your walker, pet sitter, and as many backups as you want. <strong style="color:var(--text)">They never need to download anything</strong> — the agent contacts them by SMS only. First YES gets the job.</p>
+        </div>
+
+        <div class="ob-slide" style="min-width:100%;padding:28px 26px 20px">
+          <div style="width:52px;height:52px;background:var(--gold-bg);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:16px">🔭</div>
+          <h2 style="font-size:24px;color:var(--text);margin-bottom:10px">Lookahead & visit log</h2>
+          <p style="font-size:14px;color:var(--text2);line-height:1.65"><strong style="color:var(--text)">30-day lookahead</strong> flags upcoming vet appointments, grooming due dates, medication reminders, and gaps in care coverage.</p>
+          <p style="font-size:14px;color:var(--text2);line-height:1.65;margin-top:10px"><strong style="color:var(--text)">Visit log</strong> tallies who visited, for how long, and what you owe — every Sunday morning. You pay your carers directly.</p>
+        </div>
+
+        <div class="ob-slide" style="min-width:100%;padding:28px 26px 20px">
+          <div style="width:52px;height:52px;background:var(--green-bg);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:16px">🐶</div>
+          <h2 style="font-size:24px;color:var(--text);margin-bottom:10px">You're all set!</h2>
+          <p style="font-size:14px;color:var(--text2);line-height:1.65">You're viewing <strong style="color:var(--text)">demo data</strong> — simulated pets and schedules so you can explore safely before connecting real calendars.</p>
+          <p style="font-size:14px;color:var(--text2);line-height:1.65;margin-top:10px">Tap <strong style="color:var(--text)">Get Started</strong> on the dashboard to set up your real pets, carers, and calendars.</p>
+          <button onclick="closeOnboarding()" style="margin-top:20px;width:100%;padding:13px;background:var(--orange);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer">Let's go! 🐾</button>
+        </div>
+
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 22px 18px;border-top:1px solid var(--border)" id="ob-controls">
+      <div id="ob-dots" style="display:flex;gap:6px"></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button id="ob-skip" onclick="closeOnboarding()" style="background:none;border:none;font-size:13px;color:var(--text3);cursor:pointer;font-family:'Nunito',sans-serif;padding:4px 8px">Skip</button>
+        <button id="ob-back" onclick="obNav(-1)" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Nunito',sans-serif;color:var(--text2);display:none">Back</button>
+        <button id="ob-next" onclick="obNav(1)" style="background:var(--orange);border:none;border-radius:8px;padding:7px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;color:#fff">Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ SETUP WIZARD ══════════════════ -->
+<div id="setupWizard" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.82);align-items:center;justify-content:center;padding:16px;font-family:'Nunito',sans-serif;">
+  <div style="background:var(--surface);border-radius:20px;width:100%;max-width:480px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.6);border:1px solid var(--border)">
+    <div style="padding:20px 24px 0;flex-shrink:0">
+      <div style="height:4px;background:var(--surface3);border-radius:4px;margin-bottom:16px"><div id="sw-progress" style="height:4px;background:var(--orange);border-radius:4px;transition:width .35s ease;width:10%"></div></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <span id="sw-step-label" style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3)">Step 1 of 9</span>
+        <button onclick="closeSetup()" style="background:none;border:none;font-size:18px;color:var(--text3);cursor:pointer;padding:2px 6px">✕</button>
+      </div>
+      <h2 id="sw-title" style="font-size:22px;color:var(--text);margin-bottom:4px"></h2>
+      <p id="sw-desc" style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:16px"></p>
+    </div>
+    <div id="sw-body" style="padding:0 24px 8px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px 18px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <button id="sw-back" onclick="swNav(-1)" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;color:var(--text2);font-family:'Nunito',sans-serif;display:none">← Back</button>
+      <div style="flex:1"></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button id="sw-skip-step" onclick="swNav(1)" style="background:none;border:none;font-size:13px;color:var(--text3);cursor:pointer;font-family:'Nunito',sans-serif;padding:4px 8px">Skip</button>
+        <button id="sw-next" onclick="swNext()" style="background:var(--orange);border:none;border-radius:8px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;color:#fff;font-family:'Nunito',sans-serif">Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Navigation ────────────────────────────────────────────
+function showView(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  document.getElementById('view-'+id).classList.add('active');
+  const n=document.getElementById('nav-'+id);
+  if(n)n.classList.add('active');
+  if(id==='calendar')renderCal();
+}
+function setMN(id){
+  document.querySelectorAll('.mn-item').forEach(m=>m.classList.remove('active'));
+  const mn=document.getElementById('mn-'+id);
+  if(mn)mn.classList.add('active');
+}
+
+// ── Away mode ─────────────────────────────────────────────
+let awayOn=true;
+function toggleAway(){
+  awayOn=!awayOn;
+  document.getElementById('awayDot').classList.toggle('on',awayOn);
+  document.getElementById('awayLbl').textContent=awayOn?'Away mode on':'Away mode off';
+}
+
+// ── Alerts ────────────────────────────────────────────────
+function dismissAlert(id){
+  const el=document.getElementById(id);
+  el.style.opacity='0';el.style.maxHeight='0';el.style.overflow='hidden';
+  el.style.marginBottom='0';el.style.padding='0';el.style.border='none';
+  setTimeout(()=>{el.remove();updBadge();},350);
+}
+function approveAlert(id,msg){
+  const el=document.getElementById(id);
+  el.className='alert green';
+  el.querySelector('.at').textContent='✓ '+msg;
+  el.querySelector('.ad').textContent='Agent has been approved to execute this plan.';
+  el.querySelector('.aa').innerHTML='<button class="btn bg" onclick="dismissAlert(\''+id+'\')">Dismiss</button>';
+  updBadge();
+}
+function updBadge(){
+  const c=document.querySelectorAll('#alerts .alert').length;
+  document.getElementById('nc').textContent=c;
+  document.getElementById('ab').textContent=c;
+}
+function flagHandle(btn){btn.textContent='✓ Queued';btn.className='btn bg';btn.disabled=true;btn.style.color='var(--green-t)'}
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+document.querySelectorAll('.mo').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
+
+// ── Calendar ──────────────────────────────────────────────
+const HOURS=[7,8,9,10,11,12,13,14,15,16,17,18,19,20];
+const RH=40;let wo=0;
+const EVS=[
+  [0,8,8.5,'Biscuit — morning walk','walker'],[1,8,8.5,'Biscuit — morning walk','walker'],
+  [2,8,8.5,'Biscuit — morning walk','walker'],[3,8,8.5,'Biscuit — morning walk','walker'],
+  [4,8,8.5,'Biscuit — morning walk','walker'],
+  [1,12,12.5,'Biscuit — midday walk','walker'],[3,12,12.5,'Biscuit — midday walk','walker'],
+  [0,17.5,18,'Biscuit — evening walk','walker'],[2,17.5,18,'Biscuit — evening walk','walker'],[4,17.5,18,'Biscuit — evening walk','walker'],
+  [0,18,18.5,'Both — evening feed','feeding'],[1,18,18.5,'Both — evening feed','feeding'],
+  [2,18,18.5,'Both — evening feed','feeding'],[3,18,18.5,'Both — evening feed','feeding'],[4,18,18.5,'Both — evening feed','feeding'],
+  [0,9,17,'Owner away','away'],[1,9,17,'Owner away','away'],
+  [2,14,15,'Biscuit — vet checkup','vet'],
+  [4,10,11,'Biscuit — grooming','grooming'],
+  [0,8,18,'Priya — full pet sit','sitter'],[1,8,18,'Priya — pet sit','sitter'],
+];
+const DAYS=['Mon','Tue','Wed','Thu','Fri'];
+function renderCal(){
+  const base=7+wo*7;
+  const h=document.getElementById('cHead');
+  h.innerHTML='<div style="padding:10px 4px"></div>';
+  DAYS.forEach((d,i)=>{
+    const tod=(base+i)===8&&wo===0;
+    h.innerHTML+=`<div class="dh"><span style="display:block;margin-bottom:4px;font-size:10px">${d}</span><span class="dd${tod?' today':''}">${base+i}</span></div>`;
+  });
+  document.getElementById('calT').textContent=`Apr ${base}–${base+4}, 2026`;
+  const b=document.getElementById('cBody');b.innerHTML='';
+  const tc=document.createElement('div');
+  HOURS.forEach(hr=>{const s=document.createElement('div');s.className='ts';s.textContent=hr<12?hr+' am':(hr===12?'12 pm':(hr-12)+' pm');tc.appendChild(s);});
+  b.appendChild(tc);
+  for(let c=0;c<5;c++){
+    const col=document.createElement('div');col.className='dcb';col.style.position='relative';
+    HOURS.forEach(()=>{const l=document.createElement('div');l.className='hl';col.appendChild(l);});
+    const ov=document.createElement('div');ov.style.cssText='position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;';
+    const devs=EVS.filter(e=>e[0]===c);const placed=[];
+    devs.forEach(ev=>{
+      const top=(ev[1]-HOURS[0])*RH,ht=(ev[2]-ev[1])*RH-2;
+      const ovl=placed.filter(p=>!(ev[2]<=p[1]||ev[1]>=p[2]));
+      const sl=ovl.length,tot=sl+1;
+      const el=document.createElement('div');el.className='ev '+ev[4];
+      el.style.cssText=`top:${top}px;height:${ht}px;left:calc(${sl/tot*100}%+2px);width:calc(${1/tot*100}%-4px);pointer-events:auto;`;
+      el.textContent=ev[3];ov.appendChild(el);placed.push(ev);
+    });
+    col.appendChild(ov);b.appendChild(col);
+  }
+}
+function calNav(d){wo+=d;renderCal();}
+function setCV(v){document.getElementById('cvW').classList.toggle('active',v==='week');document.getElementById('cvD').classList.toggle('active',v==='day');}
+renderCal();
+
+// ── Onboarding ────────────────────────────────────────────
+const OB_TOTAL=8;let obStep=0;
+function initDots(){
+  const d=document.getElementById('ob-dots');d.innerHTML='';
+  for(let i=0;i<OB_TOTAL;i++){const dot=document.createElement('div');dot.style.cssText=`width:${i===0?'20px':'7px'};height:7px;border-radius:10px;background:${i===0?'var(--orange)':'var(--surface3)'};transition:all .25s;`;d.appendChild(dot);}
+}
+function updateDots(){
+  const dots=document.getElementById('ob-dots').children;
+  for(let i=0;i<dots.length;i++){dots[i].style.background=i===obStep?'var(--orange)':'var(--surface3)';dots[i].style.width=i===obStep?'20px':'7px';}
+}
+function obNav(dir){
+  obStep=Math.max(0,Math.min(OB_TOTAL-1,obStep+dir));
+  document.getElementById('ob-track').style.transform=`translateX(-${obStep*100}%)`;
+  document.getElementById('ob-progress').style.width=`${((obStep+1)/OB_TOTAL)*100}%`;
+  updateDots();
+  document.getElementById('ob-back').style.display=obStep>0?'block':'none';
+  const nb=document.getElementById('ob-next'),sb=document.getElementById('ob-skip'),cd=document.getElementById('ob-controls');
+  if(obStep===OB_TOTAL-1){nb.style.display='none';sb.style.display='none';cd.style.display='none';}
+  else{nb.style.display='block';sb.style.display='block';cd.style.display='flex';}
+}
+function closeOnboarding(){
+  const el=document.getElementById('onboarding');el.style.opacity='0';el.style.transition='opacity .3s';
+  setTimeout(()=>{el.style.display='none';},300);
+  try{localStorage.setItem('pawpad_toured','1');}catch(e){}
+}
+function startOnboarding(){
+  obStep=0;initDots();
+  document.getElementById('ob-track').style.transform='translateX(0)';
+  document.getElementById('ob-progress').style.width='12.5%';
+  document.getElementById('ob-back').style.display='none';
+  document.getElementById('ob-next').style.display='block';
+  document.getElementById('ob-skip').style.display='block';
+  document.getElementById('ob-controls').style.display='flex';
+  const el=document.getElementById('onboarding');
+  el.style.opacity='0';el.style.display='flex';
+  requestAnimationFrame(()=>{el.style.transition='opacity .3s';el.style.opacity='1';});
+}
+(function(){
+  let sx=0;const track=document.getElementById('ob-track');
+  track.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;},{passive:true});
+  track.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>40)obNav(dx<0?1:-1);},{passive:true});
+})();
+
+// ── Setup Wizard ──────────────────────────────────────────
+const SW_STEPS=[
+  {title:'Welcome to setup',desc:'This wizard takes about 3 minutes. You\'ll add your pets, care team, and calendars. You can pause and come back — progress is saved.',type:'intro'},
+  {title:'Owner details',desc:'Your info is used for SMS alerts and schedule labels.',type:'form',fields:[
+    {id:'o1name',label:'Your name',type:'text',placeholder:'e.g. Alex'},
+    {id:'o1phone',label:'Your phone (SMS alerts)',type:'tel',placeholder:'(210) 555-0001'},
+    {id:'o1email',label:'Google account email',type:'text',placeholder:'alex@gmail.com'},
+  ]},
+  {title:'Your pets',desc:'Tell PawPad about each pet. You can add more later from the Pets tab.',type:'pets-setup'},
+  {title:'Connect calendars',desc:'PawPad watches these to detect when you\'re away and spot care gaps automatically.',type:'calendars'},
+  {title:'Daily care schedule',desc:'Set your pets\' standard daily routine so the agent knows what coverage to arrange.',type:'form',fields:[
+    {id:'sw-walks',label:'Walks per day (dogs)',type:'select',options:['1 walk/day','2 walks/day','3 walks/day','No dog']},
+    {id:'sw-feedtime',label:'Feeding schedule',type:'select',options:['Twice daily — 7 AM & 6 PM','Twice daily — 8 AM & 5 PM','Three times daily','Once daily']},
+    {id:'sw-away',label:'How often are you away overnight?',type:'select',options:['Rarely (few times a year)','Sometimes (monthly)','Often (weekly travel)','I work long hours daily']},
+  ]},
+  {title:'Primary walker',desc:'Your main dog walker. They\'ll receive SMS — no app needed.',type:'form',fields:[
+    {id:'w1name',label:'Full name',type:'text',placeholder:'e.g. Marcus'},
+    {id:'w1phone',label:'Mobile (SMS)',type:'tel',placeholder:'(210) 555-0101'},
+    {id:'w1rate',label:'Rate per walk',type:'text',placeholder:'$18'},
+  ]},
+  {title:'Primary pet sitter',desc:'Your go-to sitter for when you\'re away. They\'ll receive SMS — no app needed.',type:'form',fields:[
+    {id:'s1name',label:'Full name',type:'text',placeholder:'e.g. Priya'},
+    {id:'s1phone',label:'Mobile (SMS)',type:'tel',placeholder:'(210) 555-0202'},
+    {id:'s1rate',label:'Rate (per night or per visit)',type:'text',placeholder:'$40/night'},
+  ]},
+  {title:'Backup carers',desc:'Add backups in priority order. Agent texts them one at a time — first YES wins.',type:'backups'},
+  {title:'Agent behavior',desc:'Set how much the agent can handle automatically, especially when you\'re away.',type:'agent-settings'},
+  {title:'All done! 🐾',desc:'PawPad is configured. Your pets are in good hands.',type:'done'},
+];
+const SW_TOTAL=SW_STEPS.length;
+let swStep=0,swData={},swBackups=[];
+
+function startSetup(){
+  swStep=0;try{const d=localStorage.getItem('pawpad_setup');if(d)swData=JSON.parse(d);}catch(e){}
+  const el=document.getElementById('setupWizard');
+  el.style.opacity='0';el.style.display='flex';
+  requestAnimationFrame(()=>{el.style.transition='opacity .3s';el.style.opacity='1';});
+  renderSwStep();
+}
+function closeSetup(){const el=document.getElementById('setupWizard');el.style.opacity='0';setTimeout(()=>{el.style.display='none';},300);}
+function saveSwData(){try{localStorage.setItem('pawpad_setup',JSON.stringify(swData));}catch(e){}}
+function swNav(dir){collectFormValues();swStep=Math.max(0,Math.min(SW_TOTAL-1,swStep+dir));renderSwStep();}
+function swNext(){collectFormValues();if(swStep===SW_TOTAL-1){closeSetup();applySetup();return;}swStep=Math.min(SW_TOTAL-1,swStep+1);renderSwStep();}
+function collectFormValues(){document.querySelectorAll('#sw-body input,#sw-body select,#sw-body textarea').forEach(el=>{if(el.id)swData[el.id]=el.value;});saveSwData();}
+
+function renderSwStep(){
+  const step=SW_STEPS[swStep];
+  const pct=((swStep+1)/SW_TOTAL*100).toFixed(0);
+  document.getElementById('sw-progress').style.width=pct+'%';
+  document.getElementById('sw-step-label').textContent='Step '+(swStep+1)+' of '+SW_TOTAL;
+  document.getElementById('sw-title').textContent=step.title;
+  document.getElementById('sw-desc').textContent=step.desc;
+  document.getElementById('sw-back').style.display=swStep>0?'block':'none';
+  document.getElementById('sw-skip-step').style.display=(swStep===0||swStep===SW_TOTAL-1)?'none':'inline-block';
+  const nb=document.getElementById('sw-next');
+  nb.textContent=swStep===SW_TOTAL-1?'Finish & go live →':'Next →';
+  nb.style.background=swStep===SW_TOTAL-1?'#7A3A10':'var(--orange)';
+  const body=document.getElementById('sw-body');body.innerHTML='';body.style.padding='0 24px 8px';
+  if(step.type==='intro')renderSwIntro(body);
+  else if(step.type==='form')renderSwForm(body,step);
+  else if(step.type==='pets-setup')renderPetsSetup(body);
+  else if(step.type==='calendars')renderSwCals(body);
+  else if(step.type==='backups')renderSwBackups(body);
+  else if(step.type==='agent-settings')renderSwAgent(body);
+  else if(step.type==='done')renderSwDone(body);
+}
+
+function fi(id,label,type,ph,val){return`<div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px"><label style="font-size:12px;font-weight:700;color:var(--text2)">${label}</label><input id="${id}" type="${type}" placeholder="${ph}" value="${val||''}" style="font-family:'Nunito',sans-serif;font-size:13px;color:var(--text);background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:9px 11px;outline:none;width:100%"></div>`;}
+function fs(id,label,opts,val){return`<div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px"><label style="font-size:12px;font-weight:700;color:var(--text2)">${label}</label><select id="${id}" style="font-family:'Nunito',sans-serif;font-size:13px;color:var(--text);background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:9px 11px;outline:none;width:100%">${opts.map(o=>`<option${o===val?' selected':''}>${o}</option>`).join('')}</select></div>`;}
+
+function renderSwIntro(body){body.innerHTML=`<div style="text-align:center;padding:10px 0 20px"><div style="font-size:52px;margin-bottom:16px">🐕🐈</div><div style="display:flex;flex-direction:column;gap:8px;text-align:left">${['Add your pets — profiles, feeding, routines','Set up your walker, sitter, and backups','Connect Google Calendar to detect when you\'re away','Configure agent behavior for overnight coverage'].map(t=>`<div style="display:flex;align-items:center;gap:10px;background:var(--surface2);border-radius:8px;padding:10px 14px"><div style="width:20px;height:20px;background:var(--green-bg);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--green-t);font-weight:700;flex-shrink:0">✓</div><span style="font-size:13px;color:var(--text)">${t}</span></div>`).join('')}</div></div>`;}
+
+function renderSwForm(body,step){body.innerHTML=step.fields.map(f=>f.type==='select'?fs(f.id,f.label,f.options,swData[f.id]):fi(f.id,f.label,f.type,f.placeholder,swData[f.id])).join('');}
+
+function renderPetsSetup(body){
+  const pets=swData['sw-pets']?JSON.parse(swData['sw-pets']):[];
+  const refresh=()=>{
+    const list=document.getElementById('sw-pet-list');
+    list.innerHTML=pets.length?pets.map((p,i)=>`<div style="display:flex;align-items:center;gap:10px;background:var(--surface2);border-radius:8px;padding:10px 14px;margin-bottom:8px"><span style="font-size:20px">${p.type==='dog'?'🐕':'🐈'}</span><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--text)">${p.name}</div><div style="font-size:11px;color:var(--text2)">${p.breed} · ${p.age}</div></div><button onclick="removePet(${i})" style="background:none;border:none;color:var(--red-t);cursor:pointer;font-size:16px;padding:2px 6px">✕</button></div>`).join(''):`<div style="text-align:center;padding:14px;font-size:13px;color:var(--text3)">No pets added yet</div>`;
+  };
+  body.innerHTML=`<div id="sw-pet-list" style="margin-bottom:12px"></div><div style="background:var(--surface2);border-radius:10px;padding:14px;border:1px solid var(--border)">${fs('sp-type','Pet type',['🐕 Dog','🐈 Cat'],'🐕 Dog')}${fi('sp-name','Pet name','text','e.g. Biscuit','')}${fi('sp-breed','Breed','text','e.g. Labrador mix','')}${fi('sp-age','Age','text','e.g. 4 years','')}<button onclick="addSwPet()" style="width:100%;background:var(--orange);color:#fff;border:none;border-radius:8px;padding:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif">+ Add pet</button></div>`;
+  window.addSwPet=()=>{const n=document.getElementById('sp-name').value.trim(),t=document.getElementById('sp-type').value,br=document.getElementById('sp-breed').value.trim(),ag=document.getElementById('sp-age').value.trim();if(!n)return;pets.push({name:n,type:t.includes('Dog')?'dog':'cat',breed:br||'Unknown',age:ag||'?'});swData['sw-pets']=JSON.stringify(pets);saveSwData();document.getElementById('sp-name').value='';document.getElementById('sp-breed').value='';document.getElementById('sp-age').value='';refresh();};
+  window.removePet=(i)=>{pets.splice(i,1);swData['sw-pets']=JSON.stringify(pets);saveSwData();refresh();};
+  refresh();
+}
+
+function renderSwCals(body){
+  const cals=[{id:'sc_personal',label:'Your personal calendar',icon:'👤',desc:'Detects when you\'re travelling or away'},{id:'sc_partner',label:'Partner\'s calendar',icon:'👥',desc:'Optional — shared care visibility'},{id:'sc_vet',label:'Vet calendar',icon:'🏥',desc:'Import vet appointment reminders'}];
+  body.innerHTML=`<div style="background:var(--gold-bg);border:1px solid rgba(201,168,76,.25);border-radius:10px;padding:11px 14px;margin-bottom:14px;font-size:12px;color:var(--gold-t);line-height:1.5"><strong>Note:</strong> Calendar connections need a backend server to go fully live. These settings are saved and ready to activate.</div><div style="display:flex;flex-direction:column;gap:8px;padding-bottom:8px">${cals.map(c=>{const conn=swData[c.id]==='connected';return`<div style="display:flex;align-items:center;gap:12px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 14px"><div style="font-size:20px;flex-shrink:0">${c.icon}</div><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--text)">${c.label}</div><div style="font-size:11px;color:var(--text3);margin-top:1px">${c.desc}</div></div><button id="${c.id}-btn" onclick="toggleSwCal('${c.id}')" style="font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;border-radius:7px;padding:6px 14px;border:1px solid;background:${conn?'var(--green-bg)':'var(--surface3)'};color:${conn?'var(--green-t)':'var(--text2)'};border-color:${conn?'rgba(74,158,106,.3)':'var(--border2)'}">${conn?'✓ Connected':'Connect'}</button></div>`;}).join('')}</div>`;
+}
+function toggleSwCal(id){const conn=swData[id]==='connected';swData[id]=conn?'':'connected';saveSwData();const btn=document.getElementById(id+'-btn');if(swData[id]==='connected'){btn.textContent='✓ Connected';btn.style.background='var(--green-bg)';btn.style.color='var(--green-t)';}else{btn.textContent='Connect';btn.style.background='var(--surface3)';btn.style.color='var(--text2)';}}
+
+function renderSwBackups(body){
+  try{swBackups=JSON.parse(swData['sw-backups']||'[]');}catch(e){swBackups=[];}
+  const refresh=()=>{const l=document.getElementById('sw-bk-list');l.innerHTML=swBackups.length?swBackups.map((b,i)=>`<div style="display:flex;align-items:center;gap:10px;background:var(--surface2);border-radius:8px;padding:10px 14px;margin-bottom:8px"><div style="width:26px;height:26px;background:var(--purple-bg);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--purple-t);flex-shrink:0">${i+1}</div><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--text)">${b.name}</div><div style="font-size:11px;color:var(--text3)">${b.phone} · ${b.rate} · ${b.role}</div></div><button onclick="removeSwBk(${i})" style="background:none;border:none;color:var(--red-t);cursor:pointer;font-size:16px;padding:2px 6px">✕</button></div>`).join(''):`<div style="text-align:center;padding:14px;font-size:13px;color:var(--text3)">No backups added yet</div>`;};
+  body.innerHTML=`<div id="sw-bk-list" style="margin-bottom:12px"></div><div style="background:var(--surface2);border-radius:10px;padding:14px;border:1px solid var(--border)">${fi('bk-name','Name','text','e.g. Diego','')}${fi('bk-phone','Mobile (SMS)','tel','(210) 555-0000','')}${fi('bk-rate','Rate','text','$20/walk','')}${fs('bk-role','Role',['Backup walker','Backup sitter','Walker & sitter'],'Backup walker')}<button onclick="addSwBk()" style="width:100%;background:var(--orange);color:#fff;border:none;border-radius:8px;padding:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif">+ Add backup</button></div><p style="font-size:11px;color:var(--text3);text-align:center;margin-top:8px">Priority order = contact order when gaps open</p>`;
+  window.addSwBk=()=>{const n=document.getElementById('bk-name').value.trim(),p=document.getElementById('bk-phone').value.trim(),r=document.getElementById('bk-rate').value.trim(),ro=document.getElementById('bk-role').value;if(!n||!p)return;swBackups.push({name:n,phone:p,rate:r||'?',role:ro});swData['sw-backups']=JSON.stringify(swBackups);saveSwData();document.getElementById('bk-name').value='';document.getElementById('bk-phone').value='';document.getElementById('bk-rate').value='';refresh();};
+  window.removeSwBk=(i)=>{swBackups.splice(i,1);swData['sw-backups']=JSON.stringify(swBackups);saveSwData();refresh();};
+  refresh();
+}
+
+function renderSwAgent(body){
+  const tr2=(id,label,sub,def)=>{const on=swData[id]!==undefined?swData[id]==='on':def;return`<div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:13px;color:var(--text)">${label}</div><div style="font-size:11px;color:var(--text3);margin-top:2px">${sub}</div></div><div id="${id}" class="${on?'on2':''}" onclick="togSw('${id}')" style="width:36px;height:20px;border-radius:20px;cursor:pointer;position:relative;background:${on?'var(--orange)':'var(--surface3)'};flex-shrink:0;transition:background .2s"><div style="position:absolute;width:16px;height:16px;background:#fff;border-radius:50%;top:2px;left:2px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.3);transform:${on?'translateX(16px)':'translateX(0)'}"></div></div></div>`;};
+  body.innerHTML=`<div style="padding-bottom:12px">${tr2('sw-away-auto','Auto-fill when away','Contact backup automatically when primary cancels overnight',true)}${tr2('sw-req-home','Require approval when home','Show plan before contacting carers while you\'re home',true)}${tr2('sw-scan','30-day lookahead scans','Scan for care gaps and flag vet/grooming schedules nightly',true)}${tr2('sw-weeksumm','Weekly visit summary','Send pay log every Sunday morning',true)}${tr2('sw-vet-remind','Vet & grooming reminders','Track recurring pet health tasks automatically',true)}<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0"><div><div style="font-size:13px;color:var(--text)">Max rate for auto-approval</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Won't book above this without asking you</div></div><select id="sw-maxrate" onchange="swData['sw-maxrate']=this.value;saveSwData()" style="font-family:'Nunito',sans-serif;font-size:13px;border:1px solid var(--border2);border-radius:8px;padding:7px 10px;color:var(--text);background:var(--surface2);width:130px"><option>$20/walk</option><option selected>$25/walk</option><option>$30/walk</option><option>No limit</option></select></div></div>`;
+}
+function togSw(id){const t=document.getElementById(id);const isOn=t.classList.toggle('on2');t.style.background=isOn?'var(--orange)':'var(--surface3)';t.querySelector('div').style.transform=isOn?'translateX(16px)':'translateX(0)';swData[id]=isOn?'on':'off';saveSwData();}
+
+function renderSwDone(body){
+  const pets=swData['sw-pets']?JSON.parse(swData['sw-pets']):[];
+  const bks=swData['sw-backups']?JSON.parse(swData['sw-backups']):[];
+  const calCount=['sc_personal','sc_partner','sc_vet'].filter(c=>swData[c]==='connected').length;
+  body.innerHTML=`<div style="padding:6px 0 20px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px">${[['🐾','Pets',pets.length?pets.map(p=>p.name).join(' & '):'None added'],['📅','Calendars',calCount?calCount+' connected':'Pending'],['🚶','Primary walker',swData['w1name']||'Not set'],['👥','Backups',bks.length?bks.length+' added':'None yet']].map(([ic,lb,vl])=>`<div style="background:var(--surface2);border-radius:10px;padding:12px;text-align:center"><div style="font-size:22px;margin-bottom:4px">${ic}</div><div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">${lb}</div><div style="font-size:13px;font-weight:600;color:var(--text);margin-top:2px">${vl}</div></div>`).join('')}</div><div style="background:var(--green-bg);border-radius:10px;padding:14px;font-size:13px;color:var(--green-t);line-height:1.6;border:1px solid rgba(74,158,106,.2)"><strong>What happens now:</strong><br>Your setup is saved. Go to <strong>Settings → Calendars</strong> to connect live Google Calendar data when you\'re ready. The agent starts working with real data the moment calendars are connected.</div></div>`;
+}
+
+function applySetup(){
+  const gsb=document.getElementById('gs-banner');if(gsb)gsb.style.display='none';
+  try{localStorage.setItem('pawpad_setup_done','1');}catch(e){}
+}
+
+// Auto-show onboarding + hide banner if setup done
+window.addEventListener('DOMContentLoaded',()=>{
+  try{
+    if(localStorage.getItem('pawpad_setup_done')==='1'){const gsb=document.getElementById('gs-banner');if(gsb)gsb.style.display='none';}
+    const d=localStorage.getItem('pawpad_setup');if(d)swData=JSON.parse(d);
+  }catch(e){}
+  let seen=false;try{seen=localStorage.getItem('pawpad_toured')==='1';}catch(e){}
+  if(!seen)setTimeout(startOnboarding,700);
+});
+
+// PWA
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;document.getElementById('installBanner').classList.add('show');});
+const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+const isStandalone=window.navigator.standalone===true;
+if(isIOS&&!isStandalone){setTimeout(()=>document.getElementById('installBanner').classList.add('show'),2500);}
+</script>
+</body>
+</html>
